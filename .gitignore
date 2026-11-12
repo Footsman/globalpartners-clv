@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Never commit credentials. The deploy role is assumed via OIDC; nothing in
+# this repository should ever hold an AWS key.
+.aws/
+credentials
+*accessKeys.csv
+*.pem
+
+.streamlit/secrets.toml
+.DS_Store
+.idea/
+.vscode/

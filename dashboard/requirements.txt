@@ -1,0 +1,7 @@
+# pyarrow is deliberately unpinned: awswrangler declares its own bound
+# (>=18.0.0,<19.0.0 on Python 3.13) and pinning it here fights the resolver.
+streamlit>=1.40
+awswrangler>=3.11
+boto3>=1.35
+pandas>=2.2
+plotly>=5.24

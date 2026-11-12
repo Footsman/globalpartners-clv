@@ -1,0 +1,34 @@
+{
+  "_comment": "Permissions for the GitHub Actions deploy role. Write is confined to the Glue scripts prefix and the one state machine; the role cannot touch the data lake.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublishGlueScripts",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::aws-glue-assets-069318857278-us-east-1/scripts/*"
+    },
+    {
+      "Sid": "ListScriptsBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": "arn:aws:s3:::aws-glue-assets-069318857278-us-east-1"
+    },
+    {
+      "Sid": "UpdateStateMachine",
+      "Effect": "Allow",
+      "Action": [
+        "states:ListStateMachines",
+        "states:DescribeStateMachine",
+        "states:UpdateStateMachine"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
