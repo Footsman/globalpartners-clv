@@ -1,1 +1,63 @@
+name: Deploy
 
+on:
+  push:
+    branches: [main]
+    paths:
+      - "glue/**"
+      - "stepfunctions/**"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  GLUE_ASSETS_BUCKET: aws-glue-assets-069318857278-us-east-1
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publish Glue scripts
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assume deployment role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Confirm identity
+        run: aws sts get-caller-identity
+
+      - name: Sync job scripts
+        run: |
+          set -euo pipefail
+          for f in glue/*.py; do
+            name="$(basename "$f")"
+            echo "--> s3://${GLUE_ASSETS_BUCKET}/scripts/${name}"
+            aws s3 cp "$f" "s3://${GLUE_ASSETS_BUCKET}/scripts/${name}" \
+              --only-show-errors
+          done
+
+      - name: Update state machine
+        run: |
+          set -euo pipefail
+          arn=$(aws stepfunctions list-state-machines \
+                  --query "stateMachines[?name=='gp-daily-clv-pipeline'].stateMachineArn" \
+                  --output text)
+          if [ -z "$arn" ]; then
+            echo "gp-daily-clv-pipeline not found; skipping."
+            exit 0
+          fi
+          aws stepfunctions update-state-machine \
+            --state-machine-arn "$arn" \
+            --definition file://stepfunctions/gp-daily-clv-pipeline.json
+          echo "Updated $arn"
