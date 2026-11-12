@@ -1,1 +1,73 @@
 
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    name: Lint and compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tooling
+        run: pip install ruff
+
+      # Byte-compiling the Glue scripts catches syntax errors before a job run
+      # does. A Glue run takes minutes to fail; this takes seconds.
+      - name: Byte-compile
+        run: python -m compileall -q glue dashboard
+
+      - name: Lint
+        run: ruff check glue dashboard
+
+  json:
+    name: Validate JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate every JSON document
+        run: |
+          set -euo pipefail
+          fail=0
+          while IFS= read -r f; do
+            if python -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "ok   $f"
+            else
+              echo "FAIL $f"
+              fail=1
+            fi
+          done < <(find stepfunctions iam -name '*.json')
+          exit $fail
+
+      # The state machine must name jobs that actually exist in glue/.
+      # A rename on one side and not the other is the classic way this breaks.
+      - name: Check state machine references real job scripts
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib, sys
+
+          sm = json.load(open("stepfunctions/gp-daily-clv-pipeline.json"))
+          scripts = {p.stem for p in pathlib.Path("glue").glob("*.py")}
+
+          missing = []
+          for name, state in sm["States"].items():
+              job = (state.get("Parameters") or {}).get("JobName")
+              if job and job not in scripts:
+                  missing.append(f"{name} -> {job}")
+
+          if missing:
+              print("State machine references jobs with no script in glue/:")
+              print("\n".join("  " + m for m in missing))
+              sys.exit(1)
+          print("All Glue job references resolve.")
+          PY
