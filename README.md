@@ -77,6 +77,8 @@ script disagree.
 CI runs on every push and pull request: byte-compile and lint the PySpark and
 dashboard code, and validate the Step Functions and IAM JSON.
 
+No long-lived AWS keys. The deploy role’s trust policy pins the OIDC subject to repo:Footsman@249142260/globalpartners-clv@1455642793:environment:production. This account issues tokens whose subject carries the numeric owner and repository IDs rather than the names — names can be released and re-registered, IDs cannot — so the trust is immune to a rename or a re-registration of the repository name by someone else. The branch is constrained separately by a deployment-branch rule on the environment.
+
 ## Verified figures
 
 These are asserted in the jobs themselves and re-checked after every run.
