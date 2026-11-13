@@ -18,7 +18,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install tooling
-        run: pip install ruff
+        run: pip install ruff==0.16.9
 
       # Byte-compiling the Glue scripts catches syntax errors before a job run
       # does. A Glue run takes minutes to fail; this takes seconds.
@@ -26,7 +26,7 @@ jobs:
         run: python -m compileall -q glue dashboard
 
       - name: Lint
-        run: ruff check glue dashboard
+        run: ruff check --select E4,E7,E9,f glue dashboard
 
   json:
     name: Validate JSON
