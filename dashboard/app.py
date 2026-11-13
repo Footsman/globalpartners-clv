@@ -402,7 +402,7 @@ def page_churn(snap: str) -> None:
 
 def page_trends() -> None:
     st.subheader("Sales Trends & Seasonality")
-    st.caption("Order-line revenue from the silver fact table, across the full "
+    st.caption("Order-line revenue from the silver fact table, across the  "
                "history.")
 
     monthly = q(f"""
@@ -604,7 +604,7 @@ def page_loyalty(snap: str) -> None:
 
 def page_location() -> None:
     st.subheader("Location Performance")
-    st.caption("Every restaurant in the silver fact table, full history.")
+    st.caption("Every restaurant in the silver fact table,  history.")
 
     df = q(f"""
         SELECT restaurant_id,
@@ -707,7 +707,6 @@ def page_discounts() -> None:
         GROUP BY is_discounted
     """)
     disc = overall[overall["is_discounted"]]
-    full = overall[~overall["is_discounted"]]
     total_rev = float(overall["revenue"].sum())
     total_disc = float(overall["discount"].sum())
     disc_lines = int(disc["lines"].sum()) if len(disc) else 0
