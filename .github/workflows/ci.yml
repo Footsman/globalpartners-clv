@@ -26,7 +26,7 @@ jobs:
         run: python -m compileall -q glue dashboard
 
       - name: Lint
-        run: ruff check --select E4,E7,E9,f glue dashboard
+        run: ruff check --select E4,E7,E9,F glue dashboard
 
   json:
     name: Validate JSON
