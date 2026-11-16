@@ -4,7 +4,9 @@ A daily-refreshed CLV data product for a café and convenience chain. SQL Server
 source, AWS-native pipeline, all transformation logic in PySpark, Streamlit
 dashboard, deployed from this repository by GitHub Actions.
 
-Solution design and build log: <https://claude.ai/artifact/5bUSyn8LQPTWGhLU8Vc4G9>
+**[Five-minute video walkthrough](https://go.screenpal.com/watch/cOXD0bn4ux5)** — the finding
+that shaped the revenue number, the pipeline running, the dashboards, and keyless CI/CD.
+
 
 ---
 
