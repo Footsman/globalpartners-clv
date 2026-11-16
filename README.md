@@ -7,6 +7,8 @@ dashboard, deployed from this repository by GitHub Actions.
 **[Five-minute video walkthrough](https://go.screenpal.com/watch/cOXD0bn4ux5)** — the finding
 that shaped the revenue number, the pipeline running, the dashboards, and keyless CI/CD.
 
+Solution design and build log: [docs/solution-design.md](docs/solution-design.md)
+
 
 ---
 
